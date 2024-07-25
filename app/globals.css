@@ -26,6 +26,11 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+input[type='radio']:checked + span,
+input[type='checkbox']:checked + span {
+  display: block;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
