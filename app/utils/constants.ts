@@ -43,3 +43,21 @@ export const SurveyInitialData: SurveyData = {
     { name: ExteriorWorkEnum.OTHER, checked: false },
   ],
 }
+
+// supabase
+export enum PermitStatusEnum {
+  OTC = 'Over-the-Counter Submission Process',
+  IN_HOUSE = 'In-House Review Process',
+  NO_PERMIT = 'No Permit',
+}
+
+export type PermitStatus =
+  | PermitStatusEnum.IN_HOUSE
+  | PermitStatusEnum.OTC
+  | PermitStatusEnum.NO_PERMIT
+
+export interface AddPermitEntryRequest {
+  type: string
+  job_list: string[]
+  permit_status: PermitStatus
+}
