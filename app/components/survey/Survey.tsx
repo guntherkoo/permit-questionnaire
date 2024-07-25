@@ -2,18 +2,26 @@
 
 import { useEffect, useState } from 'react'
 import {
+  AddPermitEntryRequest,
+  PermitStatusEnum,
   SurveyData,
   SurveyInitialData,
   WorkTypeEnum,
 } from '@/app/utils/constants'
-import PermitRequirements from './components/PermitRequirements'
-import JobCheckList from './components/JobCheckList'
-import SelectWorkType from './components/SelectWorkType'
+import { JobCheckList, PermitRequest, SelectWorkType } from './components'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
-const Survey: React.FC = () => {
+interface SurveyProps {
+  AddPermitEntry(req: AddPermitEntryRequest): Promise<void>
+}
+
+const Survey = ({ AddPermitEntry }: SurveyProps) => {
   const [surveyData, setSurveyData] = useState<SurveyData>(SurveyInitialData)
   const [disabledSubmitBtn, setDisableSubmitBtn] = useState<boolean>(true)
-  const [submit, setSubmit] = useState<boolean>(false)
+  const [verify, setVerify] = useState<boolean>(false)
+  const [permitRequested, setPermitRequested] = useState<boolean>(false)
+  const router = useRouter()
 
   const handleWorkTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSurveyData({
@@ -22,7 +30,7 @@ const Survey: React.FC = () => {
     })
 
     // clear submit if already submitted
-    setSubmit(false)
+    setVerify(false)
   }
 
   const handleJobTypeChange = (
@@ -30,8 +38,8 @@ const Survey: React.FC = () => {
     jobType: 'interiorWork' | 'exteriorWork'
   ) => {
     // clear submit if already submitted
-    if (submit) {
-      setSubmit(false)
+    if (verify) {
+      setVerify(false)
     }
 
     const updatedCheckboxes = surveyData[jobType].map((checkbox) =>
@@ -48,8 +56,22 @@ const Survey: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log(surveyData)
-    setSubmit(true)
+    setVerify(true)
+  }
+
+  const handlePermitRequest = async (status: PermitStatusEnum) => {
+    const { interiorWork, exteriorWork } = surveyData
+    const jobList = [...interiorWork, ...exteriorWork]
+      .filter((job) => job.checked)
+      .map((job) => job.name)
+
+    const permitEntryReq: AddPermitEntryRequest = {
+      type: surveyData.workType,
+      job_list: jobList,
+      permit_status: status,
+    }
+
+    await AddPermitEntry(permitEntryReq).then(() => setPermitRequested(true))
   }
 
   useEffect(() => {
@@ -67,67 +89,78 @@ const Survey: React.FC = () => {
   }, [surveyData])
 
   return (
-    <div className="flex flex-row gap-8">
-      <form onSubmit={handleSubmit} className="basis-6/12">
-        <fieldset className="flex flex-col gap-6">
-          <div className="flex flex-row gap-5">
-            <SelectWorkType
-              type={WorkTypeEnum.INTERIOR}
-              surveyData={surveyData}
-              handleWorkTypeChange={handleWorkTypeChange}
-            />
+    <>
+      <div className="flex flex-row gap-8">
+        <form
+          onSubmit={handleSubmit}
+          className={`basis-6/12 ${
+            permitRequested
+              ? 'pointer-events-none opacity-25 transition-opacity duration-400'
+              : ''
+          }`}
+        >
+          <fieldset className="flex flex-col gap-6">
+            <div className="flex flex-row gap-5">
+              <SelectWorkType
+                type={WorkTypeEnum.INTERIOR}
+                surveyData={surveyData}
+                handleWorkTypeChange={handleWorkTypeChange}
+              />
 
-            <SelectWorkType
-              type={WorkTypeEnum.EXTERIOR}
-              surveyData={surveyData}
-              handleWorkTypeChange={handleWorkTypeChange}
-            />
-          </div>
+              <SelectWorkType
+                type={WorkTypeEnum.EXTERIOR}
+                surveyData={surveyData}
+                handleWorkTypeChange={handleWorkTypeChange}
+              />
+            </div>
 
-          {surveyData.workType === WorkTypeEnum.INTERIOR && (
-            <JobCheckList
-              workType={surveyData.interiorWork}
-              handleJobTypeChange={handleJobTypeChange}
-              jobType="interiorWork"
-            />
-          )}
+            {surveyData.workType === WorkTypeEnum.INTERIOR && (
+              <JobCheckList
+                workType={surveyData.interiorWork}
+                handleJobTypeChange={handleJobTypeChange}
+                jobType="interiorWork"
+              />
+            )}
 
-          {surveyData.workType === WorkTypeEnum.EXTERIOR && (
-            <JobCheckList
-              workType={surveyData.exteriorWork}
-              handleJobTypeChange={handleJobTypeChange}
-              jobType="exteriorWork"
-            />
-          )}
+            {surveyData.workType === WorkTypeEnum.EXTERIOR && (
+              <JobCheckList
+                workType={surveyData.exteriorWork}
+                handleJobTypeChange={handleJobTypeChange}
+                jobType="exteriorWork"
+              />
+            )}
 
-          <button
-            aria-label="Submit"
-            type="submit"
-            onClick={handleSubmit}
-            disabled={disabledSubmitBtn}
-            className="flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded bg-blue-500 px-6 text-lg text-white transition duration-400 hover:bg-blue-600 focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-blue-300 disabled:bg-blue-300 disabled:shadow-none disabled:text-blue-100"
-          >
-            Verify
-          </button>
-        </fieldset>
-      </form>
-
-      <div
-        className={`flex flex-col gap-6 basis-6/12 bg-slate-800 p-6 rounded-lg border-2 transition duration-400 ${
-          submit ? 'border-green-700' : 'border-blue-900 '
-        }`}
-      >
-        <h2 className="text-xl">Permit Required:</h2>
-        <hr className="opacity-20" />
-        {submit ? (
-          <PermitRequirements surveyData={surveyData} />
-        ) : (
-          <p className="text-neutral-300 font-light text-lg">
-            ⬅️ Verify the work you need.
-          </p>
-        )}
+            <button
+              aria-label="Submit"
+              type="submit"
+              onClick={handleSubmit}
+              disabled={disabledSubmitBtn}
+              className="flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded bg-blue-500 px-6 text-lg text-white transition duration-400 hover:bg-blue-600 focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-blue-300 disabled:bg-blue-300 disabled:shadow-none disabled:text-blue-100"
+            >
+              Verify
+            </button>
+          </fieldset>
+        </form>
+        <PermitRequest
+          verify={verify}
+          surveyData={surveyData}
+          handlePermitRequest={handlePermitRequest}
+          permitRequested={permitRequested}
+        />
       </div>
-    </div>
+      {permitRequested && (
+        <div className="flex justify-center items-center">
+          <button
+            aria-label="Request another permit"
+            type="button"
+            onClick={() => window.location.reload()}
+            className="flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded bg-lime-600 px-6 text-lg text-white transition duration-400 hover:bg-lime-500 focus:bg-lime-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-lime-300 disabled:bg-lime-300 disabled:shadow-none disabled:text-lime-100"
+          >
+            Request another permit
+          </button>
+        </div>
+      )}
+    </>
   )
 }
 
