@@ -5,12 +5,6 @@ export enum InteriorWorkEnum {
   OTHER = 'Other',
 }
 
-// export type InteriorWorkType =
-//   | InteriorWorkEnum.BATHROOM_REMODEL
-//   | InteriorWorkEnum.NEW_BATHROOM
-//   | InteriorWorkEnum.NEW_LAUNDRY_ROOM
-//   | InteriorWorkEnum.OTHER
-
 export enum ExteriorWorkEnum {
   GARAGE_DOOR_REPLACEMENT = 'Garage door replacement',
   EXTERIOR_DOORS = 'Exterior doors',
@@ -18,18 +12,10 @@ export enum ExteriorWorkEnum {
   OTHER = 'Other',
 }
 
-// export type ExteriorWorkType =
-//   | ExteriorWorkEnum.GARAGE_DOOR_REPLACEMENT
-//   | ExteriorWorkEnum.EXTERIOR_DOORS
-//   | ExteriorWorkEnum.FENCING
-//   | ExteriorWorkEnum.OTHER
-
 export enum WorkTypeEnum {
   INTERIOR = 'Interior Work',
   EXTERIOR = 'Exterior Work',
 }
-
-// export type WorkType = WorkTypeEnum.INTERIOR | WorkTypeEnum.EXTERIOR
 
 export interface Job {
   name: string
@@ -40,4 +26,20 @@ export interface SurveyData {
   workType: WorkTypeEnum | ''
   interiorWork: Job[]
   exteriorWork: Job[]
+}
+
+export const SurveyInitialData: SurveyData = {
+  workType: '',
+  interiorWork: [
+    { name: InteriorWorkEnum.BATHROOM_REMODEL, checked: false },
+    { name: InteriorWorkEnum.NEW_BATHROOM, checked: false },
+    { name: InteriorWorkEnum.NEW_LAUNDRY_ROOM, checked: false },
+    { name: InteriorWorkEnum.OTHER, checked: false },
+  ],
+  exteriorWork: [
+    { name: ExteriorWorkEnum.GARAGE_DOOR_REPLACEMENT, checked: false },
+    { name: ExteriorWorkEnum.EXTERIOR_DOORS, checked: false },
+    { name: ExteriorWorkEnum.FENCING, checked: false },
+    { name: ExteriorWorkEnum.OTHER, checked: false },
+  ],
 }

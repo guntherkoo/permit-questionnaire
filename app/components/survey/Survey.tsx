@@ -1,32 +1,18 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import {
-  ExteriorWorkEnum,
-  InteriorWorkEnum,
   SurveyData,
+  SurveyInitialData,
   WorkTypeEnum,
 } from '@/app/utils/constants'
-import { useState } from 'react'
 import PermitRequirements from './components/PermitRequirements'
-
-const SurveyInitialData: SurveyData = {
-  workType: '',
-  interiorWork: [
-    { name: InteriorWorkEnum.BATHROOM_REMODEL, checked: false },
-    { name: InteriorWorkEnum.NEW_BATHROOM, checked: false },
-    { name: InteriorWorkEnum.NEW_LAUNDRY_ROOM, checked: false },
-    { name: InteriorWorkEnum.OTHER, checked: false },
-  ],
-  exteriorWork: [
-    { name: ExteriorWorkEnum.GARAGE_DOOR_REPLACEMENT, checked: false },
-    { name: ExteriorWorkEnum.EXTERIOR_DOORS, checked: false },
-    { name: ExteriorWorkEnum.FENCING, checked: false },
-    { name: ExteriorWorkEnum.OTHER, checked: false },
-  ],
-}
+import JobCheckList from './components/JobCheckList'
+import SelectWorkType from './components/SelectWorkType'
 
 const Survey: React.FC = () => {
   const [surveyData, setSurveyData] = useState<SurveyData>(SurveyInitialData)
+  const [disabledSubmitBtn, setDisableSubmitBtn] = useState<boolean>(true)
   const [submit, setSubmit] = useState<boolean>(false)
 
   const handleWorkTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,99 +52,81 @@ const Survey: React.FC = () => {
     setSubmit(true)
   }
 
-  const enableSubmitBtn =
-    surveyData.interiorWork.some((job) => job.checked) ||
-    surveyData.exteriorWork.some((job) => job.checked)
+  useEffect(() => {
+    const { interiorWork, exteriorWork } = surveyData
+
+    const enableSubmitBtn =
+      interiorWork.some((job) => job.checked) ||
+      exteriorWork.some((job) => job.checked)
+
+    if (enableSubmitBtn) {
+      setDisableSubmitBtn(false)
+    } else {
+      setDisableSubmitBtn(true)
+    }
+  }, [surveyData])
 
   return (
-    <div className="flex flex-col gap-8">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        <div className="flex flex-row gap-5">
-          <label htmlFor="interior-work" className="cursor-pointer">
-            <input
-              id="interior-work"
-              type="radio"
-              name="interior-work"
-              value={WorkTypeEnum.INTERIOR}
-              checked={surveyData.workType === WorkTypeEnum.INTERIOR}
-              onChange={handleWorkTypeChange}
+    <div className="flex flex-row gap-8">
+      <form onSubmit={handleSubmit} className="basis-6/12">
+        <fieldset className="flex flex-col gap-6">
+          <div className="flex flex-row gap-5">
+            <SelectWorkType
+              type={WorkTypeEnum.INTERIOR}
+              surveyData={surveyData}
+              handleWorkTypeChange={handleWorkTypeChange}
             />
-            <span className="text-white text-xl pl-2">
-              {WorkTypeEnum.INTERIOR}
-            </span>
-          </label>
-          <label htmlFor="exterior-work" className="cursor-pointer">
-            <input
-              id="exterior-work"
-              type="radio"
-              name="exterior-work"
-              value={WorkTypeEnum.EXTERIOR}
-              checked={surveyData.workType === WorkTypeEnum.EXTERIOR}
-              onChange={handleWorkTypeChange}
+
+            <SelectWorkType
+              type={WorkTypeEnum.EXTERIOR}
+              surveyData={surveyData}
+              handleWorkTypeChange={handleWorkTypeChange}
             />
-            <span className="text-white text-xl pl-2">
-              {WorkTypeEnum.EXTERIOR}
-            </span>
-          </label>
-        </div>
-
-        {surveyData.workType === WorkTypeEnum.INTERIOR && (
-          <div className="flex flex-col gap-5">
-            {surveyData.interiorWork.map((job, index) => {
-              return (
-                <label
-                  htmlFor={job.name}
-                  key={`${job.name}-${index}`}
-                  className="flex flex-row gap-2 cursor-pointer"
-                >
-                  <input
-                    id={job.name}
-                    type="checkbox"
-                    name={job.name}
-                    checked={job.checked}
-                    onChange={(e) => handleJobTypeChange(e, 'interiorWork')}
-                  />
-                  {job.name}
-                </label>
-              )
-            })}
           </div>
-        )}
 
-        {surveyData.workType === WorkTypeEnum.EXTERIOR && (
-          <div className="flex flex-col gap-5">
-            {surveyData.exteriorWork.map((job, index) => {
-              return (
-                <label
-                  htmlFor={job.name}
-                  key={`${job.name}-${index}`}
-                  className="flex flex-row gap-2 cursor-pointer"
-                >
-                  <input
-                    id={job.name}
-                    type="checkbox"
-                    name={job.name}
-                    checked={job.checked}
-                    onChange={(e) => handleJobTypeChange(e, 'exteriorWork')}
-                  />
-                  {job.name}
-                </label>
-              )
-            })}
-          </div>
-        )}
+          {surveyData.workType === WorkTypeEnum.INTERIOR && (
+            <JobCheckList
+              workType={surveyData.interiorWork}
+              handleJobTypeChange={handleJobTypeChange}
+              jobType="interiorWork"
+            />
+          )}
 
-        <button
-          type="submit"
-          onClick={handleSubmit}
-          disabled={!enableSubmitBtn}
-          className="disabled:cursor-not-allowed disabled:text-slate-500"
-        >
-          Submit
-        </button>
+          {surveyData.workType === WorkTypeEnum.EXTERIOR && (
+            <JobCheckList
+              workType={surveyData.exteriorWork}
+              handleJobTypeChange={handleJobTypeChange}
+              jobType="exteriorWork"
+            />
+          )}
+
+          <button
+            aria-label="Submit"
+            type="submit"
+            onClick={handleSubmit}
+            disabled={disabledSubmitBtn}
+            className="flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded bg-blue-500 px-6 text-lg text-white transition duration-400 hover:bg-blue-600 focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-blue-300 disabled:bg-blue-300 disabled:shadow-none disabled:text-blue-100"
+          >
+            Verify
+          </button>
+        </fieldset>
       </form>
 
-      {submit && <PermitRequirements surveyData={surveyData} />}
+      <div
+        className={`flex flex-col gap-6 basis-6/12 bg-slate-800 p-6 rounded-lg border-2 transition duration-400 ${
+          submit ? 'border-green-700' : 'border-blue-900 '
+        }`}
+      >
+        <h2 className="text-xl">Permit Required:</h2>
+        <hr className="opacity-20" />
+        {submit ? (
+          <PermitRequirements surveyData={surveyData} />
+        ) : (
+          <p className="text-neutral-300 font-light text-lg">
+            ⬅️ Verify the work you need.
+          </p>
+        )}
+      </div>
     </div>
   )
 }
