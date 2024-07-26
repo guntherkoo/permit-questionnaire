@@ -9,19 +9,16 @@ import {
   WorkTypeEnum,
 } from '@/app/utils/constants'
 import { JobCheckList, PermitRequest, SelectWorkType } from './components'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 interface SurveyProps {
-  AddPermitEntry(req: AddPermitEntryRequest): Promise<void>
+  addPermitEntry(req: AddPermitEntryRequest): Promise<void>
 }
 
-const Survey = ({ AddPermitEntry }: SurveyProps) => {
+const Survey = ({ addPermitEntry }: SurveyProps) => {
   const [surveyData, setSurveyData] = useState<SurveyData>(SurveyInitialData)
   const [disabledSubmitBtn, setDisableSubmitBtn] = useState<boolean>(true)
   const [verify, setVerify] = useState<boolean>(false)
   const [permitRequested, setPermitRequested] = useState<boolean>(false)
-  const router = useRouter()
 
   const handleWorkTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSurveyData({
@@ -71,7 +68,7 @@ const Survey = ({ AddPermitEntry }: SurveyProps) => {
       permit_status: status,
     }
 
-    await AddPermitEntry(permitEntryReq).then(() => setPermitRequested(true))
+    await addPermitEntry(permitEntryReq).then(() => setPermitRequested(true))
   }
 
   useEffect(() => {
@@ -100,18 +97,23 @@ const Survey = ({ AddPermitEntry }: SurveyProps) => {
           }`}
         >
           <fieldset className="flex flex-col gap-6">
-            <div className="flex flex-row gap-5">
-              <SelectWorkType
-                type={WorkTypeEnum.INTERIOR}
-                surveyData={surveyData}
-                handleWorkTypeChange={handleWorkTypeChange}
-              />
+            <div className="flex flex-col gap-2">
+              <h4 className="text-white text-base">
+                What residential work are you doing? 
+              </h4>
+              <div className="flex flex-row gap-5">
+                <SelectWorkType
+                  type={WorkTypeEnum.INTERIOR}
+                  surveyData={surveyData}
+                  handleWorkTypeChange={handleWorkTypeChange}
+                />
 
-              <SelectWorkType
-                type={WorkTypeEnum.EXTERIOR}
-                surveyData={surveyData}
-                handleWorkTypeChange={handleWorkTypeChange}
-              />
+                <SelectWorkType
+                  type={WorkTypeEnum.EXTERIOR}
+                  surveyData={surveyData}
+                  handleWorkTypeChange={handleWorkTypeChange}
+                />
+              </div>
             </div>
 
             {surveyData.workType === WorkTypeEnum.INTERIOR && (
@@ -131,7 +133,7 @@ const Survey = ({ AddPermitEntry }: SurveyProps) => {
             )}
 
             <button
-              aria-label="Submit"
+              aria-label="Verify"
               type="submit"
               onClick={handleSubmit}
               disabled={disabledSubmitBtn}

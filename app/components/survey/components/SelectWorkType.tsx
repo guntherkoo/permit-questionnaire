@@ -19,7 +19,7 @@ const SelectWorkType = ({
   return (
     <label
       htmlFor={selectId}
-      className="relative flex flex-row items-center bg-white/10 p-6 rounded-lg shadow-md cursor-pointer"
+      className="relative flex flex-row items-center bg-white/10 py-4 px-6 rounded-lg shadow-md cursor-pointer"
     >
       <input
         id={selectId}
