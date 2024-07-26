@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Roboto_Condensed } from 'next/font/google'
 import './globals.css'
-import SurveyProvider, { SurveyContext } from './context-provider'
 
 const roboto = Roboto_Condensed({ subsets: ['latin'] })
 
@@ -17,9 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
-        <SurveyProvider>{children}</SurveyProvider>
-      </body>
+      <body className={roboto.className}>{children}</body>
     </html>
   )
 }

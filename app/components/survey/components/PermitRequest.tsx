@@ -16,7 +16,7 @@ const PermitRequest = ({
 }: PermitRequestProps) => {
   return (
     <div
-      className={`flex flex-col gap-5 basis-6/12 bg-slate-800 p-6 rounded-lg border-2 transition duration-400 ${
+      className={`flex flex-col gap-5 basis-6/12 bg-slate-800 py-4 px-6 rounded-lg border-2 transition duration-400 ${
         verify ? 'border-green-700' : 'border-blue-900 '
       }`}
     >

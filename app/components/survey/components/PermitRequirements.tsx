@@ -18,7 +18,6 @@ const PermitRequirements = ({
 }: PermitRequirementsProps) => {
   const { interiorWork, exteriorWork } = surveyData
   const getPermitStatus = () => {
-    // return in order of priority
     if (
       permitProcesslogic(
         interiorWork,
