@@ -2,7 +2,7 @@ import { AddPermitEntryRequest } from '../constants'
 import { createClient } from './server'
 import { v4 as uuidv4 } from 'uuid'
 
-export async function AddPermitEntry(req: AddPermitEntryRequest) {
+export async function addPermitEntry(req: AddPermitEntryRequest) {
   'use server'
   const supabase = createClient()
 

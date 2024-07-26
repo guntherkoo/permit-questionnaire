@@ -1,5 +1,5 @@
 import { Survey } from './components'
-import { AddPermitEntry } from '@/app/utils/supabase/actions'
+import { addPermitEntry } from '@/app/utils/supabase/actions'
 
 const Homepage = () => {
   return (
@@ -11,7 +11,7 @@ const Homepage = () => {
             Please verify some information below:
           </p>
         </div>
-        <Survey AddPermitEntry={AddPermitEntry} />
+        <Survey addPermitEntry={addPermitEntry} />
       </div>
       <p className="text-sm text-white">
         Gunther Koo - SWE | Take Home Assignment

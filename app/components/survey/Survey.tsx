@@ -11,10 +11,10 @@ import {
 import { JobCheckList, PermitRequest, SelectWorkType } from './components'
 
 interface SurveyProps {
-  AddPermitEntry(req: AddPermitEntryRequest): Promise<void>
+  addPermitEntry(req: AddPermitEntryRequest): Promise<void>
 }
 
-const Survey = ({ AddPermitEntry }: SurveyProps) => {
+const Survey = ({ addPermitEntry }: SurveyProps) => {
   const [surveyData, setSurveyData] = useState<SurveyData>(SurveyInitialData)
   const [disabledSubmitBtn, setDisableSubmitBtn] = useState<boolean>(true)
   const [verify, setVerify] = useState<boolean>(false)
@@ -68,7 +68,7 @@ const Survey = ({ AddPermitEntry }: SurveyProps) => {
       permit_status: status,
     }
 
-    await AddPermitEntry(permitEntryReq).then(() => setPermitRequested(true))
+    await addPermitEntry(permitEntryReq).then(() => setPermitRequested(true))
   }
 
   useEffect(() => {
