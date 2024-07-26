@@ -25,3 +25,9 @@ Supabase database example below:
 Supabase response can be viewed in your terminal window:
 
 ![permit-request-server-log](https://github.com/user-attachments/assets/a1fdb867-2457-450a-bebc-c4f654cb57bc)
+
+## Quick demo
+
+[Permit Request UI Walkthrough - Part 1 - Gunther Koo](https://www.loom.com/share/89116d9ed3ab4674b97954016efe4873/)
+
+[Understanding Permit Status Logic in Code - Part 2 - Gunther Koo](https://www.loom.com/share/a06171e6436d4e0aa26ca7889e153efb)
